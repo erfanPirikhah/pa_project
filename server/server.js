@@ -23,6 +23,14 @@ app.post('/api/user',(req,res)=>{
     },  (err) =>{res.status(400).send(`Somthing wrong`)}
     
     )
+});
+
+app.post('/api/login',(req,res)=>{
+    const body=_.pick(req.body,['email','password']);
+    
+    User.checkPass(body.email,body.password).then((user)=>{
+        user.generateAuthToken();
+    });
 })
 
 
