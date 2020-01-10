@@ -46,21 +46,22 @@ let UserSchema= new mongoose.Schema({
         return _.pick(userObject,['_id','fullname','email'])
     }
 
-    UserSchema.static.checkPass()=function (email,password){
+    UserSchema.statics.checkPass=function (email,password){
         let User=this;
+
         return User.findOne({
-            email:email
+            email
         }).then((user)=>{
             if (!user) {
                 return Promise.reject();
             }
 
-            return new Promise((resolve,reqject)=>{
-                bcrypt.compare(password,User.password,(err,res)=>{
+            return new Promise((resolve,reject)=>{
+                bcrypt.compare(password,user.password,(err,res)=>{
                     if (res) {
-                        resolve(user)
+                        resolve(user);
                     }else{
-                        reject()
+                        reject();
                     }
                 })
             })
@@ -72,9 +73,9 @@ let UserSchema= new mongoose.Schema({
         let access='auth';
 
         let token=jwt.sign({
-            _id=user._id.toHexString(),
+            _id: user._id.toHexString(),
             access
-        },config.get("JWT_SECRET")).toString();
+        },config.get('JWT_SECRET')).toString();
 
         user.tokens.push({
             access,

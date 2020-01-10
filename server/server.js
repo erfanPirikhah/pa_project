@@ -19,8 +19,8 @@ app.post('/api/user',(req,res)=>{
     let user= new User(body);
 
     user.save().then(
-        (user)=>{res.status(200).send(user);
-    },  (err) =>{res.status(400).send(`Somthing wrong`)}
+        (user)=>{res.status(200).send('ثبت نام با موفقیت انجام شد');
+    },  (err) =>{res.status(400).send(`مشکلی پیش آمده لطفا دوباره ثبت نام نمایید`)}
     
     )
 });
@@ -28,8 +28,15 @@ app.post('/api/user',(req,res)=>{
 app.post('/api/login',(req,res)=>{
     const body=_.pick(req.body,['email','password']);
     
+
     User.checkPass(body.email,body.password).then((user)=>{
-        user.generateAuthToken();
+        user.generateAuthToken().then((token)=>{
+            res.header('x-auth',token).status(200).send('احرازهویت با موفقیت انجام شد')
+        },(err) => {
+            res.status(400).json({
+                Error: `Something went wrong. ${err}`
+            });
+        });
     });
 })
 
